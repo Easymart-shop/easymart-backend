@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product');  // মডেলের path ঠিক আছে নিশ্চিত হও
+const product = require('../models/product');  // মডেলের path ঠিক আছে নিশ্চিত হও
 
 // সব প্রোডাক্ট আনার API
 router.get('/', async (req, res) => {

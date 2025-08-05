@@ -1,7 +1,8 @@
-const express = require("express");
+const express = require("express"); 
 const router = express.Router();
-const product = require("../models/product");
+const Product = require("../models/product"); // ✅ এই লাইনে ঠিক করো
 
+// GET all products
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
