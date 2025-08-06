@@ -1,28 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const product = require('../models/product');  // মডেলের path ঠিক আছে নিশ্চিত হও
+const mongoose = require("mongoose");
 
-// সব প্রোডাক্ট আনার API
-router.get('/', async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.json(products);
-  } catch (err) {
-    console.error('Error fetching products:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  oldPrice: { type: Number },
+  description: { type: String },
+  image: { type: String },
+  extraImgs: [String],
+  stock: { type: Number, default: 0 },
+  rating: { type: Number, default: 0 },
 });
 
-// নির্দিষ্ট আইডি দিয়ে প্রোডাক্ট আনার API (optional)
-router.get('/:id', async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product);
-  } catch (err) {
-    console.error('Error fetching product:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-module.exports = router;
+module.exports = mongoose.model("Product", productSchema);

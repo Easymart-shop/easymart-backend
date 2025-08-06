@@ -1,35 +1,27 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const Product = require("../models/product");
+const Product = require('../models/product');  // মডেল ইম্পোর্ট
 
-// GET all products
-router.get("/", async (req, res) => {
+// সব প্রোডাক্ট আনার API
+router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find({});
     res.json(products);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error fetching products:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// POST new product
-router.post("/", async (req, res) => {
-  const product = new Product({
-    name: req.body.name,
-    price: req.body.price,
-    oldPrice: req.body.oldPrice,
-    description: req.body.description,
-    image: req.body.image,
-    extraImgs: req.body.extraImgs,
-    stock: req.body.stock,
-    rating: req.body.rating,
-  });
-
+// নির্দিষ্ট আইডি দিয়ে প্রোডাক্ট আনার API (optional)
+router.get('/:id', async (req, res) => {
   try {
-    const newProduct = await product.save();
-    res.status(201).json(newProduct);
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    res.json(product);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error('Error fetching product:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
