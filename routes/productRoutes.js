@@ -25,4 +25,32 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
+// ✅ নতুন প্রোডাক্ট যোগ করার API (POST)
+router.post('/', async (req, res) => {
+  try {
+    const { name, price, oldPrice, description, image, extraImgs, stock, rating } = req.body;
+
+    const newProduct = new Product({
+      name,
+      price,
+      oldPrice,
+      description,
+      image,
+      extraImgs,
+      stock,
+      rating
+    });
+
+    const savedProduct = await newProduct.save();
+    res.status(201).json(savedProduct);
+  } catch (err) {
+    console.error('Error creating product:', err);
+    res.status(400).json({ error: 'Bad Request', message: err.message });
+  }
+});
+
+
+
+
 module.exports = router;
