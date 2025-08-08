@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 
 // ✅ Import Product Routes
 const productRoutes = require("./routes/productRoutes");
-const authRoutes = require("./routes/auth");
+const authRoutes = require('./routes/authRoutes');
 
 // ✅ Middleware (CORS আগে বসান)
 app.use(cors({
