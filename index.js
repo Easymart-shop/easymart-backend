@@ -11,8 +11,21 @@ const productRoutes = require("./routes/productRoutes");
 const authRoutes = require('./routes/authRoutes');
 
 // ✅ Middleware (CORS আগে বসান)
+const allowedOrigins = [
+  'https://easymart-frontend-vd14.onrender.com',  // পুরোনো ডেভ ডোমেইন
+  'https://easymartsbd.com',                      // তোমার নতুন কাস্টম ডোমেইন
+  'https://www.easymartsbd.com'                   // www সহ ডোমেইন (যদি থাকে)
+];
+
 app.use(cors({
-  origin: 'https://easymart-frontend-vd14.onrender.com',
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true); // Postman বা সার্ভারে সরাসরি অ্যাক্সেসের জন্য অনুমতি
+    if(allowedOrigins.indexOf(origin) !== -1){
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
