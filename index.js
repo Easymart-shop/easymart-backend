@@ -16,7 +16,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5500",
   "http://127.0.0.1:8080",
   "http://localhost:8080",
-  "https://easymart-frontend-vd14.onrender.com",
+  "https://easymart-frontend-vd14.onrender.com", // Render hosted frontend
   "https://easymartsbd.com",
   "https://www.easymartsbd.com"
 ];
@@ -25,7 +25,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // e.g., Postman, curl, server-side
+      if (!origin) return callback(null, true); // e.g., Postman, curl, server-side request
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -70,7 +70,7 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// ✅ Start server
+// ✅ Start Server
 app.listen(port, () => {
   console.log(`🚀 Server is running on http://localhost:${port}`);
 });
