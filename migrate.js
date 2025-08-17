@@ -1,15 +1,18 @@
-const mongoose = require("mongoose");
+require("dotenv").config();
 
-// 🔗 MongoDB URL (নিজের .env থেকে নিন)
+const mongoose = require("mongoose");
+require("dotenv").config(); // 👈 .env লোড করবে
+
+// 🔗 MongoDB URL (.env থেকে আসবে)
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/easymart";
 
-// পুরোনো products schema
+// পুরোনো products schema (flexible)
 const oldProductSchema = new mongoose.Schema({}, { strict: false });
-const OldProduct = mongoose.model("Product", oldProductSchema, "products");
+const OldProduct = mongoose.model("OldProduct", oldProductSchema, "products");
 
 // নতুন products schema
 const newProductSchema = new mongoose.Schema({
-  _id: String, // এখানে আমরা string id রাখব
+  _id: String,
   name: String,
   price: Number,
   oldPrice: Number,
@@ -19,25 +22,30 @@ const newProductSchema = new mongoose.Schema({
   stock: Number,
   rating: Number,
 });
-const NewProduct = mongoose.model("ProductNew", newProductSchema, "products_new");
+const NewProduct = mongoose.model("NewProduct", newProductSchema, "products_new");
 
 async function migrate() {
   try {
     await mongoose.connect(MONGO_URI);
     console.log("✅ MongoDB connected");
 
-    // সব পুরোনো product আনো
+    // সব পুরোনো প্রোডাক্ট আনো
     const oldProducts = await OldProduct.find({});
     console.log(`📦 Found ${oldProducts.length} products`);
 
     for (let prod of oldProducts) {
-      // ObjectId কে string এ রূপান্তর
       const newProd = {
-        ...prod.toObject(),
-        _id: prod._id.toString(),
+        _id: prod._id.toString(), // ObjectId → String
+        name: prod.name,
+        price: prod.price,
+        oldPrice: prod.oldPrice,
+        description: prod.description,
+        image: prod.image,
+        extraImgs: prod.extraImgs || [],
+        stock: prod.stock || 0,
+        rating: prod.rating || 0,
       };
 
-      // নতুন collection এ save
       await NewProduct.findByIdAndUpdate(newProd._id, newProd, { upsert: true });
       console.log(`➡️ Migrated: ${newProd._id} (${newProd.name})`);
     }
