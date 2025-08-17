@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Product = require('../models/product');  // মডেল ইম্পোর্ট
 
@@ -13,18 +14,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// নির্দিষ্ট আইডি দিয়ে প্রোডাক্ট আনার API (optional)
+// ✅ নির্দিষ্ট আইডি দিয়ে প্রোডাক্ট আনার API
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+    const { id } = req.params;
+    let product;
+
+    // যদি ObjectId হয়
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      product = await Product.findById(id);
+    } else {
+      // নাহলে string id ধরে খুঁজবে
+      product = await Product.findOne({ _id: id });
+    }
+
+    if (!product) return res.status(404).json({ error: '❌ Product not found' });
+
     res.json(product);
   } catch (err) {
     console.error('Error fetching product:', err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 // ✅ নতুন প্রোডাক্ট যোগ করার API (POST)
 router.post('/', async (req, res) => {
@@ -49,8 +60,5 @@ router.post('/', async (req, res) => {
     res.status(400).json({ error: 'Bad Request', message: err.message });
   }
 });
-
-
-
 
 module.exports = router;
