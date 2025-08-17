@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Product = require('../models/product');  // মডেল ইম্পোর্ট
 
-// সব প্রোডাক্ট আনার API
+// ✅ সব প্রোডাক্ট আনার API
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find({});
@@ -18,17 +18,17 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    let product;
 
-    // যদি ObjectId হয়
-    if (mongoose.Types.ObjectId.isValid(id)) {
-      product = await Product.findById(id);
-    } else {
-      // নাহলে string id ধরে খুঁজবে
-      product = await Product.findOne({ _id: id });
+    // ObjectId না হলে 400 error
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: '❌ Invalid product ID' });
     }
 
-    if (!product) return res.status(404).json({ error: '❌ Product not found' });
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ error: '❌ Product not found' });
+    }
 
     res.json(product);
   } catch (err) {
