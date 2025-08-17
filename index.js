@@ -4,7 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 // ✅ Import Routes
 const productRoutes = require("./routes/productRoutes");
@@ -16,17 +16,18 @@ const allowedOrigins = [
   "http://127.0.0.1:5500",
   "http://127.0.0.1:8080",
   "http://localhost:8080",
+  "http://localhost:5500",
   "https://easymart-frontend-vd14.onrender.com", // Render hosted frontend
   "https://easymartsbd.com",
-  "https://www.easymartsbd.com"
+  "https://www.easymartsbd.com",
+  "https://api.easymartsbd.com" // 🔥 api subdomain added
 ];
 
 // ✅ CORS Middleware
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // e.g., Postman, curl, server-side request
-      if (allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.log("❌ CORS blocked request from:", origin);
@@ -45,17 +46,17 @@ app.use(express.json());
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 
-// ✅ Health Check Route
+// ✅ Health Check
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "OK", message: "Backend is running 🚀" });
 });
 
-// ✅ Home Route Test
+// ✅ Root Test
 app.get("/", (req, res) => {
   res.send("🟢 EasyMart Backend is Running");
 });
 
-// ✅ Error Handler Middleware (must be after routes)
+// ✅ Error Handler (must be last)
 app.use((err, req, res, next) => {
   console.error("🔥 Backend Error:", err.message);
   res.status(500).json({
@@ -66,11 +67,14 @@ app.use((err, req, res, next) => {
 
 // ✅ MongoDB Connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
 // ✅ Start Server
-app.listen(port, () => {
-  console.log(`🚀 Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
 });
